@@ -57,4 +57,29 @@ if ($hassiteconfig) {
         'en-US-GuyNeural',
         PARAM_TEXT
     ));
+
+    // Firebase Settings.
+    $settings->add(new admin_setting_configtext(
+        'mod_aitutorial/firebase_apikey',
+        get_string('firebase_apikey', 'mod_aitutorial'),
+        get_string('firebase_apikey_desc', 'mod_aitutorial'),
+        '',
+        PARAM_RAW
+    ));
+
+    $settings->add(new admin_setting_configtext(
+        'mod_aitutorial/firebase_authdomain',
+        get_string('firebase_authdomain', 'mod_aitutorial'),
+        get_string('firebase_authdomain_desc', 'mod_aitutorial'),
+        '',
+        PARAM_TEXT
+    ));
+
+    $settings->add(new admin_setting_configtext(
+        'mod_aitutorial/firebase_projectid',
+        get_string('firebase_projectid', 'mod_aitutorial'),
+        get_string('firebase_projectid_desc', 'mod_aitutorial'),
+        '',
+        PARAM_TEXT
+    ));
 }

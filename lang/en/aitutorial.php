@@ -59,6 +59,14 @@ $string['maxfilesize_desc'] = 'Maximum allowed PDF file size in megabytes';
 $string['ttsvoice'] = 'Text-to-Speech Voice';
 $string['ttsvoice_desc'] = 'Edge TTS voice ID for narration (e.g., en-US-GuyNeural)';
 
+// Firebase Settings.
+$string['firebase_apikey'] = 'Firebase API Key';
+$string['firebase_apikey_desc'] = 'The API Key for your Firebase project.';
+$string['firebase_authdomain'] = 'Firebase Auth Domain';
+$string['firebase_authdomain_desc'] = 'The Auth Domain for your Firebase project (e.g., your-project.firebaseapp.com).';
+$string['firebase_projectid'] = 'Firebase Project ID';
+$string['firebase_projectid_desc'] = 'The Project ID for your Firebase project.';
+
 // Notifications.
 $string['generationstarted'] = 'Your tutorial generation has started!';
 $string['generationcomplete'] = 'Your AI-generated tutorial is ready!';

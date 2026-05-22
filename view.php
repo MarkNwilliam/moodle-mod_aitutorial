@@ -200,10 +200,14 @@ if (!empty($userjobs)) {
 echo html_writer::end_tag('div'); // End aitutorial-container
 echo html_writer::end_tag('div'); // End aitutorial-main-content
 
+$firebaseapikey = get_config('mod_aitutorial', 'firebase_apikey');
+$firebaseauthdomain = get_config('mod_aitutorial', 'firebase_authdomain');
+$firebaseprojectid = get_config('mod_aitutorial', 'firebase_projectid');
+
 $PAGE->requires->js_call_amd('mod_aitutorial/auth_helper', 'init', [
-    'apiKey' => "AIzaSyDbF0Pcal-OfnnmLVLcgd_5on4_rZl8lHs",
-    'authDomain' => "cuppaai.firebaseapp.com",
-    'projectId' => "cuppaai"
+    'apiKey' => $firebaseapikey ?: '',
+    'authDomain' => $firebaseauthdomain ?: '',
+    'projectId' => $firebaseprojectid ?: ''
 ]);
 $PAGE->requires->js_call_amd('mod_aitutorial/job_tracker', 'init', [$cm->id]);
 echo $OUTPUT->footer();
