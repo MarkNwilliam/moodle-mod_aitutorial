@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
+    <defs>
+        <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#4F46E5" />
+            <stop offset="100%" stop-color="#EC4899" />
+        </linearGradient>
+        <linearGradient id="sparkGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#FCD34D" />
+            <stop offset="100%" stop-color="#F59E0B" />
+        </linearGradient>
+    </defs>
+    
+    <!-- Background rounded square -->
+    <rect x="4" y="4" width="56" height="56" rx="14" fill="url(#bgGrad)" />
+    
+    <!-- Document/PDF Outline -->
+    <path d="M20 18H36L44 26V46C44 48.2091 42.2091 50 40 50H20C17.7909 50 16 48.2091 16 46V22C16 19.7909 17.7909 18 20 18Z" fill="#ffffff" fill-opacity="0.2" stroke="#ffffff" stroke-width="2.5" stroke-linejoin="round"/>
+    <path d="M36 18V26H44" stroke="#ffffff" stroke-width="2.5" stroke-linejoin="round"/>
+    
+    <!-- Video play icon over document -->
+    <path d="M27 28L37 34L27 40V28Z" fill="#ffffff" />
+    
+    <!-- AI Sparkle Top Right -->
+    <path d="M46 10L47.5 14.5L52 16L47.5 17.5L46 22L44.5 17.5L40 16L44.5 14.5Z" fill="url(#sparkGrad)" />
+    
+    <!-- AI Sparkle Bottom Left -->
+    <path d="M14 42L15 45L18 46L15 47L14 50L13 47L10 46L13 45Z" fill="url(#sparkGrad)" />
+</svg>

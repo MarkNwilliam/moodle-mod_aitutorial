@@ -1,0 +1,186 @@
+/* AI Tutorial Generator - Modern UI Styles */
+
+:root {
+    --aitutorial-primary: #4f46e5;    /* Deep Indigo */
+    --aitutorial-accent: #06b6d4;     /* Electric Cyan */
+    --aitutorial-bg: #f8fafc;
+    --aitutorial-card-bg: #ffffff;
+    --aitutorial-text: #1e293b;
+    --aitutorial-text-light: #64748b;
+    --aitutorial-success: #10b981;
+    --aitutorial-error: #ef4444;
+}
+
+.aitutorial-container {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    color: var(--aitutorial-text);
+}
+
+/* Help Section Card */
+.aitutorial-help-card {
+    background: linear-gradient(135deg, var(--aitutorial-primary) 0%, #3730a3 100%);
+    color: white;
+    padding: 24px;
+    border-radius: 16px;
+    margin-bottom: 30px;
+    box-shadow: 0 10px 15px -3px rgba(79, 70, 229, 0.2);
+    position: relative;
+    overflow: hidden;
+}
+
+.aitutorial-help-card::after {
+    content: '🎓';
+    position: absolute;
+    right: -10px;
+    bottom: -10px;
+    font-size: 8rem;
+    opacity: 0.1;
+    transform: rotate(-15deg);
+}
+
+.aitutorial-help-card h3 {
+    color: white !important;
+    margin-top: 0;
+    font-weight: 700;
+}
+
+.aitutorial-help-steps {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+    margin-top: 20px;
+}
+
+.aitutorial-step {
+    background: rgba(255, 255, 255, 0.1);
+    padding: 15px;
+    border-radius: 12px;
+    backdrop-filter: blur(4px);
+}
+
+.aitutorial-step-icon {
+    font-size: 1.5rem;
+    margin-bottom: 10px;
+    display: block;
+}
+
+/* Upload Form */
+.aitutorial-upload-form {
+    background: var(--aitutorial-card-bg);
+    padding: 24px;
+    border-radius: 16px;
+    border: 1px solid #e2e8f0;
+    margin-bottom: 40px;
+}
+
+.aitutorial-upload-form h3 {
+    margin-bottom: 20px;
+    font-weight: 600;
+}
+
+.aitutorial-upload-form .form-group {
+    margin-bottom: 20px;
+}
+
+/* Job Cards */
+.aitutorial-jobs-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+    gap: 24px;
+    margin-top: 30px;
+}
+
+.aitutorial-job-card {
+    background: var(--aitutorial-card-bg);
+    border-radius: 16px;
+    border: 1px solid #e2e8f0;
+    padding: 20px;
+    transition: all 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+}
+
+.aitutorial-job-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+}
+
+/* Progress Bar Customization */
+.aitutorial-job-card .progress {
+    height: 8px !important;
+    background-color: #f1f5f9 !important;
+    border-radius: 4px !important;
+    margin: 15px 0 !important;
+    overflow: hidden;
+}
+
+.aitutorial-job-card .progress-bar {
+    background: linear-gradient(90deg, var(--aitutorial-primary) 0%, var(--aitutorial-accent) 100%) !important;
+    transition: width 0.5s ease;
+}
+
+.progress-text {
+    font-size: 0.85rem;
+    color: var(--aitutorial-text-light);
+    text-align: right;
+    font-weight: 500;
+}
+
+/* Badge Styling */
+.aitutorial-job-card .badge {
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-weight: 600;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.025em;
+    align-self: flex-start;
+}
+
+.status-pending { background: #fef3c7; color: #92400e; }
+.status-processing { background: #dbeafe; color: #1e40af; }
+.status-completed { background: #dcfce7; color: #166534; }
+.status-failed { background: #fee2e2; color: #991b1b; }
+
+/* Empty State */
+.aitutorial-empty {
+    text-align: center;
+    padding: 60px 20px;
+    background: #f8fafc;
+    border: 2px dashed #e2e8f0;
+    border-radius: 24px;
+}
+
+.aitutorial-empty-icon {
+    font-size: 4rem;
+    margin-bottom: 20px;
+    display: block;
+}
+
+/* Media Players */
+.generated-media-container {
+    margin-top: 15px;
+    border-radius: 12px;
+    overflow: hidden;
+    background: #000;
+}
+
+.btn-download {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 12px;
+    width: 100%;
+    justify-content: center;
+}
+
+@keyframes pulse {
+    0% { opacity: 1; }
+    50% { opacity: 0.6; }
+    100% { opacity: 1; }
+}
+
+.status-processing {
+    animation: pulse 2s infinite;
+}
