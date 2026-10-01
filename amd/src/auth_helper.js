@@ -7,6 +7,7 @@ define(['jquery', 'core/notification'], function($, Notification) {
     var auth = null;
     var signInWithEmailAndPassword = null;
     var activeAuthMode = 'signin'; // 'signin' or 'signup'
+    var BACKEND_URL = 'https://cuppai.top';
 
     function showAuthError(msg) {
         $('#auth-status').html('<span style="color:#d9534f;">' + msg + '</span>');
@@ -56,7 +57,7 @@ define(['jquery', 'core/notification'], function($, Notification) {
         // profile + starter credits), then sign in client-side.
         setAuthBusy(true);
         $('#auth-status').html('Creating your account...');
-        fetch('https://cuppai.top/api/signup', {
+        fetch(BACKEND_URL + '/api/signup', {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
             body: JSON.stringify({email: email, password: password})
@@ -95,6 +96,12 @@ define(['jquery', 'core/notification'], function($, Notification) {
      */
     function init(config) {
         console.log('Cuppa AI: Auth helper initializing...');
+
+        // Backend URL comes from the plugin setting (view.php passes it in).
+        // Fall back to the default host when it is not supplied.
+        if (config && config.apiBaseUrl) {
+            BACKEND_URL = String(config.apiBaseUrl).replace(/\/+$/, '');
+        }
 
         if (typeof window.firebase === 'undefined') {
             try {

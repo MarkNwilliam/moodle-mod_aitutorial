@@ -8,6 +8,9 @@
 - **`backend_job_id` write hardening** (`locallib.php`): only scalar `job_id` values are persisted.
 - **Job-history error rendering** (`view.php`): the failed-job banner passes `error_message` through `aitutorial_str()` before escaping, so a non-string stored value can no longer break the activity page.
 
+### Fixed
+- **Sign-up posted to the wrong host on a custom backend** (`amd/src/auth_helper.js` + `amd/build/auth_helper.min.js`): the signup request was hardcoded to `https://cuppai.top/api/signup` instead of using the configured `mod_aitutorial/api_url`. On any site whose backend URL is not that default (for example `https://www.cuppai.top`), Sign Up failed while Sign In kept working. `init()` now accepts `apiBaseUrl` from `view.php` and the request uses it, matching how `job_tracker.js` already handled the setting.
+
 ### Added
 - **Works with zero configuration out of the box**: Firebase client values ship as working defaults in `view.php`, so a fresh install runs immediately with no admin setup. Site administrators can still override any of the six values under **Site Administration → Plugins → AI Tutorial Generator** (`settings.php` now exposes `firebase_apikey`, `firebase_authdomain`, `firebase_projectid`, `firebase_storagebucket`, `messaging_sender_id`, `firebase_appid`).
 - **`block_aitutorial` uses the same configuration** (`block_aitutorial.php`): the block reads the mod plugin's Firebase settings with the same defaults instead of carrying its own separate hardcoded copy.

@@ -264,6 +264,7 @@ $firebaseconfig = [
     'messagingSenderId' => get_config('mod_aitutorial', 'messaging_sender_id') ?: '390647117252',
     'appId' => get_config('mod_aitutorial', 'firebase_appid') ?: '1:390647117252:web:926052958af71480bb2091',
 ];
+$firebaseconfig['apiBaseUrl'] = get_config('mod_aitutorial', 'api_url') ?: 'https://cuppai.top';
 $PAGE->requires->js_call_amd('mod_aitutorial/auth_helper', 'init', [$firebaseconfig]);
 $PAGE->requires->js_call_amd('mod_aitutorial/job_tracker', 'init', [
     $cm->id,
