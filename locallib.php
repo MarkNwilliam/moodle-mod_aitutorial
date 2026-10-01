@@ -5,11 +5,33 @@
  * AI Tutorial Generator - Local Library Functions
  *
  * @package    mod_aitutorial
- * @copyright  2026 Your Name
+ * @copyright  2026 Nlugwa Mark William
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die();
+
+/**
+ * Safely convert a value from a decoded JSON payload into a string.
+ *
+ * Prevents "Object of class stdClass could not be converted to string" and
+ * "Array to string conversion" errors when fields we expect to be plain
+ * strings come back nested (e.g. a failed job whose error is an object).
+ *
+ * @param mixed $value Value from the API response
+ * @param string $fallback Fallback string when the value is empty/missing
+ * @return string
+ */
+function aitutorial_str($value, $fallback = '') {
+    if (is_null($value) || $value === false || $value === '') {
+        return $fallback;
+    }
+    if (is_array($value) || is_object($value)) {
+        $json = json_encode($value);
+        return ($json === false || $json === '') ? $fallback : $json;
+    }
+    return (string)$value;
+}
 
 /**
  * Trigger generation job via backend API.
@@ -25,11 +47,20 @@ function aitutorial_trigger_generation($jobid, $pdffile, $generationmode, $conte
 
     $apibaseurl = get_config('mod_aitutorial', 'api_url');
     if (empty($apibaseurl)) {
-        $apibaseurl = 'https://aitutorial-api-1776284710.eastus.cloudapp.azure.com';
+        $apibaseurl = 'https://cuppai.top';
     }
 
-    // ... (rest of temp file logic)
+    // Copy the uploaded PDF to a temp file for the API request.
+    $tempfile = $CFG->tempdir . '/aitutorial_' . $jobid . '_' . time() . '.pdf';
     $pdffile->copy_content_to($tempfile);
+
+    // A Firebase ID token is required to authenticate against the backend.
+    if (empty($firebase_token)) {
+        @unlink($tempfile);
+        $DB->set_field('aitutorial_jobs', 'status', 'failed', ['id' => $jobid]);
+        $DB->set_field('aitutorial_jobs', 'error_message', 'Sign in with Google before generating.', ['id' => $jobid]);
+        return false;
+    }
 
     // Prepare API request.
     $apiurl = $apibaseurl . '/api/generate';
@@ -54,7 +85,10 @@ function aitutorial_trigger_generation($jobid, $pdffile, $generationmode, $conte
 
     // Make API call.
     $response = $curl->post($apiurl, $postdata);
-    $httpcode = $curl->info['http_code'];
+    $httpcode = !empty($curl->info['http_code']) ? (int)$curl->info['http_code'] : 0;
+
+    // Clean up the temp file once the request has been sent.
+    @unlink($tempfile);
 
     if ($httpcode !== 200) {
         // Mark job as failed.
@@ -72,6 +106,11 @@ function aitutorial_trigger_generation($jobid, $pdffile, $generationmode, $conte
         $DB->set_field('aitutorial_jobs', 'status', 'failed', ['id' => $jobid]);
         $DB->set_field('aitutorial_jobs', 'error_message', 'Invalid API response', ['id' => $jobid]);
         return false;
+    }
+
+    // Save the backend's job_id so the frontend JS can poll the backend directly.
+    if (!empty($result['job_id']) && is_scalar($result['job_id'])) {
+        $DB->set_field('aitutorial_jobs', 'backend_job_id', aitutorial_str($result['job_id']), ['id' => $jobid]);
     }
 
     // Update job status to processing.
@@ -103,7 +142,7 @@ function aitutorial_send_notification($jobid, $status, $message = '') {
     $eventtype = ($status === 'complete') ? 'generationcomplete' : 'generationfailed';
     $messagebody = ($status === 'complete') 
         ? get_string('notification_body_complete', 'mod_aitutorial', 'tutorial')
-        : get_string('notification_body_failed', 'mod_aitutorial', $message);
+        : get_string('notification_body_failed', 'mod_aitutorial', aitutorial_str($message));
 
     // Create Moodle notification.
     \core\notification::add(

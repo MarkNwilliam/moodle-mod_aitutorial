@@ -5,7 +5,7 @@
  * AI Tutorial Generator - File Serving
  *
  * @package    mod_aitutorial
- * @copyright  2026 Your Name
+ * @copyright  2026 Nlugwa Mark William
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 

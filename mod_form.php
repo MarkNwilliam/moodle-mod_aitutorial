@@ -5,7 +5,7 @@
  * AI Tutorial Generator - Activity Form
  *
  * @package    mod_aitutorial
- * @copyright  2026 Your Name
+ * @copyright  2026 Nlugwa Mark William
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -22,7 +22,7 @@ class mod_aitutorial_mod_form extends moodleform_mod {
         $mform = $this->_form;
         
         // Name.
-        $mform->addElement('text', 'name', get_string('name', 'aitutorial'), ['size' => '64']);
+        $mform->addElement('text', 'name', get_string('name'), ['size' => '64']);
         if (!empty($CFG->formatstringstriptags)) {
             $mform->setType('name', PARAM_TEXT);
         } else {
@@ -31,7 +31,7 @@ class mod_aitutorial_mod_form extends moodleform_mod {
         $mform->addRule('name', null, 'required', null, 'client');
         
         // Description.
-        $this->standard_intro_elements(get_string('intro', 'aitutorial'));
+        $this->standard_intro_elements();
         
         // Default generation mode (set by teacher).
         $modeoptions = [

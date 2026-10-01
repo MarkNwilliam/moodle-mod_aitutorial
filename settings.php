@@ -5,22 +5,22 @@
  * AI Tutorial Generator - Admin Settings
  *
  * @package    mod_aitutorial
- * @copyright  2026 Your Name
+ * @copyright  2026 Nlugwa Mark William
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die();
 
-if ($hassiteconfig) {
-    $settings = new admin_settingpage('mod_aitutorial_settings', get_string('pluginname', 'mod_aitutorial'));
-    $ADMIN->add('modsettings', $settings);
+// Moodle automatically creates and registers $settings for mod plugins.
+// We only add our individual settings to it — never create or re-add the page.
+if ($hassiteconfig && $settings) {
 
     // Backend API URL.
     $settings->add(new admin_setting_configtext(
         'mod_aitutorial/api_url',
         get_string('apiurl', 'mod_aitutorial'),
         get_string('apiurl_desc', 'mod_aitutorial'),
-        'https://aitutorial-api-1776284710.eastus.cloudapp.azure.com',
+        'https://cuppai.top',
         PARAM_URL
     ));
 
@@ -58,7 +58,8 @@ if ($hassiteconfig) {
         PARAM_TEXT
     ));
 
-    // Firebase Settings.
+    // Firebase Settings. These are supplied by the site administrator so no
+    // project credentials are hardcoded in the plugin.
     $settings->add(new admin_setting_configtext(
         'mod_aitutorial/firebase_apikey',
         get_string('firebase_apikey', 'mod_aitutorial'),
@@ -81,5 +82,29 @@ if ($hassiteconfig) {
         get_string('firebase_projectid_desc', 'mod_aitutorial'),
         '',
         PARAM_TEXT
+    ));
+
+    $settings->add(new admin_setting_configtext(
+        'mod_aitutorial/firebase_storagebucket',
+        get_string('firebase_storagebucket', 'mod_aitutorial'),
+        get_string('firebase_storagebucket_desc', 'mod_aitutorial'),
+        '',
+        PARAM_TEXT
+    ));
+
+    $settings->add(new admin_setting_configtext(
+        'mod_aitutorial/messaging_sender_id',
+        get_string('firebase_messagingsenderid', 'mod_aitutorial'),
+        get_string('firebase_messagingsenderid_desc', 'mod_aitutorial'),
+        '',
+        PARAM_TEXT
+    ));
+
+    $settings->add(new admin_setting_configtext(
+        'mod_aitutorial/firebase_appid',
+        get_string('firebase_appid', 'mod_aitutorial'),
+        get_string('firebase_appid_desc', 'mod_aitutorial'),
+        '',
+        PARAM_RAW
     ));
 }

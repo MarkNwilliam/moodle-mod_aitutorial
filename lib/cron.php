@@ -5,17 +5,19 @@
  * AI Tutorial Generator - Cron Handler
  *
  * @package    mod_aitutorial
- * @copyright  2026 Your Name
+ * @copyright  2026 Nlugwa Mark William
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die();
 
+require_once($CFG->dirroot . '/mod/aitutorial/locallib.php');
+
 /**
  * Cron function to check job status and update progress.
  */
 function aitutorial_cron() {
-    global $DB;
+    global $DB, $CFG;
 
     mtrace("Running AI Tutorial Generator cron...");
 
@@ -29,13 +31,16 @@ function aitutorial_cron() {
 
     $apibaseurl = get_config('mod_aitutorial', 'api_url');
     if (empty($apibaseurl)) {
-        $apibaseurl = 'https://aitutorial-api-1776284710.eastus.cloudapp.azure.com';
+        $apibaseurl = 'https://cuppai.top';
     }
 
     $curl = new curl();
     $curl->setopt([
         'CURLOPT_RETURNTRANSFER' => true,
-        'CURLOPT_TIMEOUT' => 10,
+        'CURLOPT_CONNECTTIMEOUT' => 20,
+        'CURLOPT_LOW_SPEED_LIMIT' => 5000,
+        'CURLOPT_LOW_SPEED_TIME' => 90,
+        'CURLOPT_TIMEOUT' => 1800,
     ]);
 
     foreach ($processingjobs as $job) {
@@ -48,70 +53,109 @@ function aitutorial_cron() {
             continue;
         }
 
-        // Poll backend API for status.
-        $apiurl = $apibaseurl . '/api/status/' . $job->id;
-        $response = $curl->get($apiurl);
+        // The backend mirrors Moodle's job id, but prefer the stored backend id
+        // if it differs.
+        $backendid = !empty($job->backend_job_id) ? $job->backend_job_id : $job->id;
 
-        if ($response === false) {
-            mtrace("Failed to get status for job {$job->id}");
+        // Poll backend API for status. The no-auth status endpoint allows the
+        // Moodle server (which has no Firebase session) to read job progress.
+        $apiurl = $apibaseurl . '/api/status-no-auth/' . $backendid;
+        $response = $curl->get($apiurl);
+        $httpcode = !empty($curl->info['http_code']) ? $curl->info['http_code'] : 0;
+
+        if ($response === false || $httpcode !== 200) {
+            mtrace("Failed to get status for job {$job->id} (HTTP {$httpcode})");
             continue;
         }
 
         $result = json_decode($response, true);
-        if (!$result) {
+        if (!$result || empty($result['status'])) {
+            mtrace("Invalid status response for job {$job->id}");
             continue;
         }
 
-        // Update job status and progress.
-        $update = new stdClass();
-        $update->id = $job->id;
-        $update->timemodified = time();
-
-        if (isset($result['progress'])) {
-            $update->progress = $result['progress'];
+        // Cast the status to a plain string (never interpolate a raw object).
+        $status = aitutorial_str($result['status']);
+        if ($status === '') {
+            mtrace("Invalid status response for job {$job->id}");
+            continue;
         }
 
-        if (isset($result['status'])) {
-            $update->status = $result['status'];
+        // Job is still running: just sync progress.
+        $running = ['pending', 'processing', 'ai_thinking', 'rendering'];
+        if (in_array($status, $running)) {
+            $update = new stdClass();
+            $update->id = $job->id;
+            $update->timemodified = time();
+            if (isset($result['progress'])) {
+                $update->progress = (int)$result['progress'];
+            }
+            $DB->update_record('aitutorial_jobs', $update);
+            mtrace("Updated job {$job->id}: {$status} (" . (int)($result['progress'] ?? 0) . "%)");
+            continue;
         }
 
-        if (isset($result['error'])) {
-            $update->error_message = $result['error'];
+        // Job failed on the backend.
+        if ($status === 'failed') {
+            $errormsg = aitutorial_str($result['error'] ?? null, 'Generation failed on backend');
+            $DB->set_field('aitutorial_jobs', 'status', 'failed', ['id' => $job->id]);
+            $DB->set_field('aitutorial_jobs', 'error_message', $errormsg, ['id' => $job->id]);
+            mtrace("Job {$job->id} failed: {$errormsg}");
+            continue;
         }
 
-        // Check if video/poster files are ready to download.
-        if ($result['status'] === 'completed') {
-            $context = context_module::instance_by_id($job->aitutorialid);
-            
+        // Job completed: download the output files into the Moodle file system.
+        if ($status === 'completed') {
+            // $job->aitutorialid is the activity INSTANCE id, not the course module id.
+            $cm = get_coursemodule_from_instance('aitutorial', $job->aitutorialid);
+            if (empty($cm)) {
+                mtrace("Job {$job->id}: course module not found for instance {$job->aitutorialid}");
+                continue;
+            }
+            $context = context_module::instance($cm->id);
+
             $videopath = null;
-            $posterpath = null;
-
-            // Download video if available.
-            if (!empty($result['video_url'])) {
+            $video_url = $apibaseurl . '/api/download/' . $backendid . '/video';
+            $videodata = $curl->get($video_url);
+            $httpcode = !empty($curl->info['http_code']) ? $curl->info['http_code'] : 0;
+            $attempts = 1;
+            while (($videodata === false || $httpcode !== 200) && $attempts < 4) {
+                mtrace("Job {$job->id}: video download attempt {$attempts} failed (HTTP {$httpcode}), retrying...");
+                $attempts++;
+                $videodata = $curl->get($video_url);
+                $httpcode = !empty($curl->info['http_code']) ? $curl->info['http_code'] : 0;
+            }
+            if ($videodata !== false && $httpcode === 200) {
                 $videotempfile = $CFG->tempdir . '/aitutorial_video_' . $job->id . '.mp4';
-                $videodata = $curl->get($result['video_url']);
-                if ($videodata !== false) {
-                    file_put_contents($videotempfile, $videodata);
-                    $videopath = $videotempfile;
-                }
+                file_put_contents($videotempfile, $videodata);
+                $videopath = $videotempfile;
+            } else {
+                mtrace("Job {$job->id}: video download failed from {$video_url}");
             }
 
-            // Download poster if available.
-            if (!empty($result['poster_url'])) {
-                $postertempfile = $CFG->tempdir . '/aitutorial_poster_' . $job->id . '.pdf';
-                $posterdata = $curl->get($result['poster_url']);
-                if ($posterdata !== false) {
+            $posterpath = null;
+            if ($job->job_type === 'poster' || $job->job_type === 'both') {
+                $poster_url = $apibaseurl . '/api/download/' . $backendid . '/poster';
+                $posterdata = $curl->get($poster_url);
+                if ($posterdata !== false && !empty($curl->info['http_code']) && $curl->info['http_code'] === 200) {
+                    $postertempfile = $CFG->tempdir . '/aitutorial_poster_' . $job->id . '.pdf';
                     file_put_contents($postertempfile, $posterdata);
                     $posterpath = $postertempfile;
+                } else {
+                    mtrace("Job {$job->id}: poster download failed from {$poster_url}");
                 }
             }
 
-            // Complete the job.
+            // Complete the job (stores files, flips status to completed).
+            if ($videopath === null && $posterpath === null) {
+                $DB->set_field('aitutorial_jobs', 'status', 'failed', ['id' => $job->id]);
+                $DB->set_field('aitutorial_jobs', 'error_message',
+                    'Generation completed on backend but output could not be downloaded', ['id' => $job->id]);
+                mtrace("Job {$job->id}: no output downloaded (video or poster) - marked failed.");
+                continue;
+            }
             aitutorial_complete_job($job->id, $videopath, $posterpath, $context);
             mtrace("Job {$job->id} completed successfully.");
-        } else {
-            $DB->update_record('aitutorial_jobs', $update);
-            mtrace("Updated job {$job->id}: {$update->status} ({$update->progress}%)");
         }
     }
 

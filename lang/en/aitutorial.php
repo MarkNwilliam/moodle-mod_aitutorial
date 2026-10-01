@@ -5,7 +5,7 @@
  * AI Tutorial Generator - Language Strings (English)
  *
  * @package    mod_aitutorial
- * @copyright  2026 Your Name
+ * @copyright  2026 Nlugwa Mark William
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -19,11 +19,13 @@ $string['aitutorial:addinstance'] = 'Add a new AI Tutorial Generator';
 $string['aitutorial:view'] = 'View AI Tutorial Generator';
 $string['aitutorial:submit'] = 'Submit documents for generation';
 $string['aitutorial:manage'] = 'Manage AI Tutorial Generator';
+$string['pluginadministration'] = 'AI Tutorial Administration';
 
 // Form strings.
 $string['name'] = 'Name';
 $string['intro'] = 'Description';
 $string['generationmode'] = 'Generation Mode';
+$string['generationmode_help'] = 'Select what type of content the AI should generate from student PDFs.';
 $string['generationmode_video'] = 'Video Only';
 $string['generationmode_poster'] = 'Poster Only';
 $string['generationmode_both'] = 'Both Video & Poster';
@@ -58,14 +60,18 @@ $string['maxfilesize'] = 'Maximum File Size (MB)';
 $string['maxfilesize_desc'] = 'Maximum allowed PDF file size in megabytes';
 $string['ttsvoice'] = 'Text-to-Speech Voice';
 $string['ttsvoice_desc'] = 'Edge TTS voice ID for narration (e.g., en-US-GuyNeural)';
-
-// Firebase Settings.
 $string['firebase_apikey'] = 'Firebase API Key';
-$string['firebase_apikey_desc'] = 'The API Key for your Firebase project.';
+$string['firebase_apikey_desc'] = 'The Web API Key for your Firebase project (Site Administration → Plugins → AI Tutorial Generator).';
 $string['firebase_authdomain'] = 'Firebase Auth Domain';
 $string['firebase_authdomain_desc'] = 'The Auth Domain for your Firebase project (e.g., your-project.firebaseapp.com).';
 $string['firebase_projectid'] = 'Firebase Project ID';
 $string['firebase_projectid_desc'] = 'The Project ID for your Firebase project.';
+$string['firebase_storagebucket'] = 'Firebase Storage Bucket';
+$string['firebase_storagebucket_desc'] = 'The Storage bucket for your Firebase project (e.g., your-project.firebasestorage.app).';
+$string['firebase_messagingsenderid'] = 'Firebase Messaging Sender ID';
+$string['firebase_messagingsenderid_desc'] = 'The Messaging Sender ID for your Firebase project.';
+$string['firebase_appid'] = 'Firebase App ID';
+$string['firebase_appid_desc'] = 'The Web App ID for your Firebase project.';
 
 // Notifications.
 $string['generationstarted'] = 'Your tutorial generation has started!';

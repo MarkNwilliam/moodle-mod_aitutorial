@@ -5,7 +5,7 @@
  * AI Tutorial Generator - Course Index Page
  *
  * @package    mod_aitutorial
- * @copyright  2026 Your Name
+ * @copyright  2026 Nlugwa Mark William
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -22,11 +22,11 @@ $context = context_course::instance($course->id);
 require_capability('mod/aitutorial:addinstance', $context);
 
 $PAGE->set_url('/mod/aitutorial/index.php', ['id' => $course->id]);
-$PAGE->set_title(get_string('modulenameplural', 'aitutorial'));
+$PAGE->set_title(get_string('modulenameplural', 'mod_aitutorial'));
 $PAGE->set_heading($course->fullname);
 
 echo $OUTPUT->header();
-echo $OUTPUT->heading(get_string('modulenameplural', 'aitutorial'));
+echo $OUTPUT->heading(get_string('modulenameplural', 'mod_aitutorial'));
 
 // Get all aitutorial instances in this course.
 $aitutorials = $DB->get_records('aitutorial', ['course' => $course->id], 'name ASC');
@@ -40,7 +40,7 @@ if (!empty($aitutorials)) {
     ];
     
     foreach ($aitutorials as $aitutorial) {
-        $cm = get_coursemodule_from_instance('aitutorial', $aitutorial->id, $course->id);
+        $cm = get_coursemodule_from_instance('aitutorial', $aitutorial->id, $course->id, false, MUST_EXIST);
         $url = new moodle_url('/mod/aitutorial/view.php', ['id' => $cm->id]);
         
         // Count completed jobs.
